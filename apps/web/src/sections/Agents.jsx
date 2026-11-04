@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { icons, Reveal, SectionHead, Tick } from '../components/ui';
+import { icons, Tick } from '../components/ui';
 import { agents } from '../data/seed';
 
 // The brand blue at falling opacity, one step per panel. Checked for readable text on each.
@@ -100,26 +100,25 @@ export default function Agents() {
   return (
     <section className="section" id="agents">
       <div className="container">
-        <SectionHead
-          eyebrow="Agentic AI Platform"
-          title={<>Four AI agents.<br /><span className="grad-text">One unified brain.</span></>}
-          text="Our four AI agents share context and work together seamlessly. Choose an agent to see what it does."
-        />
-      </div>
-      <Reveal y={48}>
-        <div className="agent-panels" ref={wrap}>
-          {agents.map((agent, i) => (
-            <Panel
-              key={agent.key}
-              agent={agent}
-              index={i}
-              on={active === i}
-              onSelect={() => setActive(i)}
-              bodyRef={(el) => { bodies.current[i] = el; }}
-            />
-          ))}
+        {/* Deliberately not animated: in this section only the four panels move. */}
+        <div className="section-head agents-head">
+          <span className="eyebrow">Agentic AI Platform</span>
+          <h2 className="h2">Four AI agents.<br /><span className="grad-text">One unified brain.</span></h2>
+          <p className="lead">Our four AI agents share context and work together seamlessly. Choose an agent to see what it does.</p>
         </div>
-      </Reveal>
+      </div>
+      <div className="agent-panels" ref={wrap}>
+        {agents.map((agent, i) => (
+          <Panel
+            key={agent.key}
+            agent={agent}
+            index={i}
+            on={active === i}
+            onSelect={() => setActive(i)}
+            bodyRef={(el) => { bodies.current[i] = el; }}
+          />
+        ))}
+      </div>
     </section>
   );
 }
