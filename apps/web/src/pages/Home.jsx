@@ -1,3 +1,4 @@
+import ScrollTone from '../components/ScrollTone';
 import Hero from '../sections/Hero';
 import Agents from '../sections/Agents';
 import Features from '../sections/Features';
@@ -7,6 +8,7 @@ import { Compare, DemoCTA, FeatureRequests, Integrations, Onboarding, Platform, 
 export default function Home() {
   return (
     <>
+      <ScrollTone />
       <Hero />
       <Trust />
       <Agents />

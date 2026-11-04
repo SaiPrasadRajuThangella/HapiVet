@@ -98,8 +98,12 @@ h1, h2, h3, h4, p { margin: 0; }
 }
 
 /* ---------- hero ---------- */
-.hero { position: relative; min-height: 100svh; display: grid; align-items: center; padding: 120px 0 80px; overflow: hidden; background: linear-gradient(160deg, #cfe3ea 0%, #a9cbd8 45%, #8dbccb 100%); isolation: isolate; }
-.hero::before { content: ''; position: absolute; inset: auto 0 0 0; height: 34%; background: linear-gradient(to top, rgba(255,255,255,0.75), transparent); z-index: -1; }
+.hero { position: relative; min-height: 100svh; display: grid; align-items: center; padding: 120px 0 80px; overflow: hidden; isolation: isolate; }
+/* Home page background layers, cross-faded on scroll by ScrollTone. */
+.tone { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.tone i { position: absolute; inset: 0; will-change: opacity; }
+.tone-hero { background: linear-gradient(160deg, #cfe3ea 0%, #a9cbd8 45%, #8dbccb 100%); }
+.tone-navy { background: var(--navy); opacity: 0; }
 .hero-grid { display: grid; grid-template-columns: 1.25fr 0.95fr; gap: 24px; align-items: center; }
 .hero-copy { display: grid; gap: 26px; justify-items: start; position: relative; z-index: 2; }
 .hero-copy .h1 { font-size: clamp(2.5rem, 4.2vw, 3.75rem); }
@@ -149,10 +153,15 @@ h1, h2, h3, h4, p { margin: 0; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 .logo-chip { padding: 14px 24px; background: #fff; border-radius: 999px; font-weight: 600; font-size: 15px; color: var(--ink-2); white-space: nowrap; box-shadow: var(--shadow-sm); display: inline-flex; gap: 10px; align-items: center; }
 .logo-chip svg { color: var(--blue); }
-.trust { padding: 56px 0 24px; }
+.trust { padding: clamp(64px, 8vw, 110px) 0; }
 .trust p { text-align: center; font-size: 12px; letter-spacing: 0.14em; font-weight: 600; color: var(--gray-500); margin-bottom: 26px; }
 
 /* ---------- agents ---------- */
+.agents-head, .agents-head .eyebrow, .agents-head .lead { transition: color 0.35s; }
+#agents[data-tone='dark'] .agents-head { color: #fff; }
+#agents[data-tone='dark'] .agents-head .eyebrow { color: var(--blue-soft); }
+#agents[data-tone='dark'] .agents-head .lead { color: rgba(255, 255, 255, 0.78); }
+#agents[data-tone='dark'] .agents-head .grad-text { background-image: linear-gradient(120deg, #fff, var(--blue-soft)); }
 /* The strip runs edge to edge, but everything inside is sized from --inner, the page's content width.
    The first and last panels take the leftover gutters, so their content still lines up with the page. */
 .agent-panels { --inner: min(100cqw - 48px, 1180px); --gutter: calc((100cqw - var(--inner)) / 2); --open-w: calc(var(--inner) * 5 / 8); --art-h: calc(var(--inner) * 0.29); --art-c: calc(var(--art-h) / 2 + 36px); --word: calc(var(--inner) * 0.078); --photo: calc(var(--inner) * 0.22); container-type: inline-size; display: flex; height: var(--panels-h, 660px); overflow: hidden; background: #fff; }
