@@ -113,7 +113,8 @@ h1, h2, h3, h4, p { margin: 0; }
 .hero-stage { position: relative; height: min(70vh, 640px); min-height: 420px; }
 .hero-stage canvas { touch-action: pan-y; }
 .stage-fallback { position: absolute; inset: 0; display: grid; place-items: center; }
-.stage-fallback i { width: 55%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, var(--blue) 60%, var(--blue-deep)); filter: blur(1px); animation: float 6s ease-in-out infinite; }
+.stage-fallback i { width: 55%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent 70%); animation: float 6s ease-in-out infinite; }
+.stage-fallback img { width: min(72%, 400px); aspect-ratio: 1; object-fit: cover; border-radius: 50%; box-shadow: var(--shadow-lg); animation: float 6s ease-in-out infinite; }
 @keyframes float { 50% { transform: translateY(-14px); } }
 .float-card { position: absolute; background: rgba(255, 255, 255, 0.94); border-radius: 16px; padding: 12px 16px; box-shadow: var(--shadow); font-size: 13px; display: flex; gap: 10px; align-items: center; max-width: 260px; z-index: 3; }
 .float-card .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--navy); color: #fff; flex: none; }

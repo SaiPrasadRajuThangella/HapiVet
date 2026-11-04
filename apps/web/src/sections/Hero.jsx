@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, CircleDollarSign, FileText, Phone } from 'lucide-react';
 import { Counter } from '../components/ui';
+import { unsplash } from '../lib/img';
 import { stats } from '../data/seed';
 import { useCollection } from '../lib/store';
 
@@ -24,7 +25,13 @@ class SceneBoundary extends Component {
   render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
-const Fallback = <div className="stage-fallback"><i /></div>;
+const Loading = <div className="stage-fallback"><i /></div>;
+// Only shown when WebGL is unavailable or the 3D scene fails to load.
+const Fallback = (
+  <div className="stage-fallback">
+    <img src={unsplash('1587300003388-59208cc962cb', 700)} alt="A happy dog smiling at the camera" decoding="async" />
+  </div>
+);
 const ease = [0.22, 1, 0.36, 1];
 
 function Words({ text, delay = 0, className }) {
@@ -108,14 +115,16 @@ export default function Hero() {
         </motion.div>
 
         <motion.div className="hero-stage" style={{ y: stageY }}>
-          {mountScene === 'on' ? (
+          {!mountScene && Loading}
+          {mountScene === 'off' && Fallback}
+          {mountScene === 'on' && (
             <SceneBoundary fallback={Fallback}>
-              <Suspense fallback={Fallback}><Scene3D /></Suspense>
+              <Suspense fallback={Loading}><Scene3D /></Suspense>
             </SceneBoundary>
-          ) : Fallback}
-          <FloatCard icon={Phone} title="Answering call" sub="(555) 234-8901" style={{ top: '8%', left: '-2%' }} delay={1} />
-          <FloatCard icon={FileText} title="Writing SOAP note" sub="Bella · Post-op checkup" style={{ top: '46%', right: '-3%' }} delay={1.25} />
-          <FloatCard icon={CircleDollarSign} title="AI captured $450" sub="Missed charges in Room 2" style={{ bottom: '6%', left: '6%' }} delay={1.5} />
+          )}
+          <FloatCard icon={Phone} title="Answering call" sub="(555) 234-8901" style={{ top: '3%', left: '-7%' }} delay={1} />
+          <FloatCard icon={FileText} title="Writing SOAP note" sub="Bella · Post-op checkup" style={{ top: '-2%', right: '-8%' }} delay={1.25} />
+          <FloatCard icon={CircleDollarSign} title="AI captured $450" sub="Missed charges in Room 2" style={{ bottom: '-4%', left: '-8%' }} delay={1.5} />
         </motion.div>
       </div>
       <div className="scroll-hint"><span>Scroll</span><i /></div>
