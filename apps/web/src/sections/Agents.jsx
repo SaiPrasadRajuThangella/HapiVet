@@ -116,13 +116,6 @@ export default function Agents() {
             ))}
           </div>
         </Reveal>
-        <Reveal className="shared-brain">
-          <div>
-            <h3 className="h3" style={{ marginBottom: 6 }}>Shared memory, unified intelligence</h3>
-            <p>When Front Desk books an appointment, Clinical already knows why. When Clinical finishes a note, Revenue captures every charge. One intelligent system.</p>
-          </div>
-          <Link to="/demo" className="btn btn-light">See it live <ArrowRight size={16} /></Link>
-        </Reveal>
       </div>
     </section>
   );

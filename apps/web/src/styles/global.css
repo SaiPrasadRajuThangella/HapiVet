@@ -198,8 +198,6 @@ h1, h2, h3, h4, p { margin: 0; }
   .agent-points { grid-template-columns: 1fr 1fr; }
   .agent-foot { flex-wrap: wrap; }
 }
-.shared-brain { margin-top: 28px; background: var(--navy); color: #fff; border-radius: var(--radius); padding: 28px 34px; display: flex; gap: 22px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-.shared-brain p { color: rgba(255,255,255,0.72); max-width: 640px; }
 /* Phones: the panels stack and open downward as an accordion. */
 @media (max-width: 820px) {
   .agent-panels { --open-w: 100cqw; --art-h: min(58cqw, 340px); --art-c: calc(var(--art-h) / 2 + 66px); --word: min(13.5cqw, 88px); --photo: min(42cqw, 250px); flex-direction: column; height: auto; }
