@@ -222,11 +222,12 @@ export const faqs = [
   ['What’s the 24/7 Live Support?', 'Growth and above includes 24/7 access to live Zoom support — jump on a call with our team anytime.'],
 ];
 
+// Slots sit outside the calendar's open hours so these samples don't take real times off the booking page.
 export const leads = [
-  { _id: 'l1', name: 'Dr. Maya Patel', email: 'maya@cedarvet.com', clinic: 'Cedar Veterinary', size: '2-5 vets', message: 'Interested in migrating from Cornerstone.', status: 'new', createdAt: '2026-10-30T14:12:00Z' },
-  { _id: 'l2', name: 'Tom Alvarez', email: 'tom@brightpaws.com', clinic: 'Bright Paws Hospital', size: '6-10 vets', message: 'Need a multi-location demo.', status: 'contacted', createdAt: '2026-10-28T09:40:00Z' },
-  { _id: 'l3', name: 'Dr. Priya Nair', email: 'priya@harborpet.com', clinic: 'Harbor Pet Clinic', size: 'Solo', message: 'Pricing for the Vanilla plan?', status: 'demo-booked', createdAt: '2026-10-26T17:05:00Z' },
-  { _id: 'l4', name: 'Jason Lee', email: 'jason@summitanimal.com', clinic: 'Summit Animal Care', size: '2-5 vets', message: '', status: 'new', createdAt: '2026-10-25T11:21:00Z' },
+  { _id: 'l1', type: 'demo', name: 'Dr. Maya Patel', email: 'maya@cedarvet.com', phone: '+15550100101', clinic: 'Cedar Veterinary', jobTitle: 'Hospital Owner', city: 'Austin, TX', slot: '2026-11-18T16:00:00.000Z', timeZone: 'America/Chicago', message: 'Interested in migrating from Cornerstone.', status: 'new', createdAt: '2026-10-30T14:12:00Z' },
+  { _id: 'l2', type: 'demo', name: 'Tom Alvarez', email: 'tom@brightpaws.com', phone: '+15550100102', clinic: 'Bright Paws Hospital', jobTitle: 'Practice Manager', city: 'Denver, CO', slot: '2026-11-19T17:00:00.000Z', timeZone: 'America/Denver', message: 'Need a multi-location demo.', status: 'contacted', createdAt: '2026-10-28T09:40:00Z' },
+  { _id: 'l3', type: 'demo', name: 'Dr. Priya Nair', email: 'priya@harborpet.com', phone: '+15550100103', clinic: 'Harbor Pet Clinic', jobTitle: 'Veterinarian', city: 'Seattle, WA', slot: '2026-11-20T17:00:00.000Z', timeZone: 'America/Los_Angeles', meetingLink: 'https://meet.google.com/abc-defg-hij', message: 'Pricing for the Vanilla plan?', status: 'demo-booked', createdAt: '2026-10-26T17:05:00Z' },
+  { _id: 'l4', type: 'demo', name: 'Jason Lee', email: 'jason@summitanimal.com', phone: '+15550100104', clinic: 'Summit Animal Care', jobTitle: 'Clinic Director', city: 'Raleigh, NC', slot: '2026-11-24T15:00:00.000Z', timeZone: 'America/New_York', message: '', status: 'accepted', createdAt: '2026-10-25T11:21:00Z' },
 ];
 
 export const settings = {

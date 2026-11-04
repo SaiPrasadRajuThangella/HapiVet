@@ -1,6 +1,6 @@
 // Mock data layer. Collections live in localStorage so edits made in the admin panel show on the
 // public site. Replace the bodies of these functions with fetch() calls once the Express API exists.
-import { useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 import * as seed from '../data/seed';
 
 const defaults = {
@@ -44,12 +44,24 @@ const subscribe = (cb) => {
   return () => listeners.delete(cb);
 };
 
+// Another tab changed the data (an admin moving a lead, say): drop our copy so this tab shows it straight away.
+window.addEventListener('storage', (e) => {
+  if (e.key && !e.key.startsWith('hv:')) return;
+  if (e.key) delete cache[e.key.slice(3)];
+  else Object.keys(cache).forEach((n) => delete cache[n]);
+  listeners.forEach((l) => l());
+});
+
 export const useCollection = (name) => useSyncExternalStore(subscribe, () => read(name));
 
 const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 
 export const db = {
-  create: (name, doc) => write(name, [{ _id: uid(), createdAt: new Date().toISOString(), ...doc }, ...read(name)]),
+  create: (name, doc) => {
+    const created = { _id: uid(), createdAt: new Date().toISOString(), ...doc };
+    write(name, [created, ...read(name)]);
+    return created;
+  },
   update: (name, id, patch) => write(name, read(name).map((d) => (d._id === id ? { ...d, ...patch } : d))),
   remove: (name, id) => write(name, read(name).filter((d) => d._id !== id)),
   setObject: (name, patch) => write(name, { ...read(name), ...patch }),
@@ -85,3 +97,44 @@ export const auth = {
 };
 
 export const useAuth = () => useSyncExternalStore(subscribe, auth.get);
+
+// ---- customer sign-in (mock). Any mobile number works and the code is always 123456. ----
+const USER_KEY = 'hv:user';
+const PROFILES_KEY = 'hv:profiles'; // by mobile number, so an edited name survives signing out
+export const DEMO_OTP = '123456';
+
+const readProfiles = () => {
+  try { return JSON.parse(localStorage.getItem(PROFILES_KEY)) || {}; } catch { return {}; }
+};
+
+function saveUser(user) {
+  try {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+    localStorage.setItem(PROFILES_KEY, JSON.stringify({ ...readProfiles(), [user.phone]: user }));
+  } catch { /* noop */ }
+  listeners.forEach((l) => l());
+}
+
+export const userAuth = {
+  login(phone, code) {
+    if (code !== DEMO_OTP) return false;
+    saveUser(readProfiles()[phone] || { phone, name: 'HapiVet User', email: `user${phone.slice(-4)}@example.com` });
+    return true;
+  },
+  logout() {
+    try { localStorage.removeItem(USER_KEY); } catch { /* noop */ }
+    listeners.forEach((l) => l());
+  },
+  update(patch) {
+    const raw = userAuth.get();
+    if (raw) saveUser({ ...JSON.parse(raw), ...patch });
+  },
+  get() {
+    try { return localStorage.getItem(USER_KEY); } catch { return null; }
+  },
+};
+
+export const useUser = () => {
+  const raw = useSyncExternalStore(subscribe, userAuth.get);
+  return useMemo(() => (raw ? JSON.parse(raw) : null), [raw]);
+};

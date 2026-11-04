@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Menu, X } from 'lucide-react';
+import { Avatar } from './Account';
+import { useUser } from '../lib/store';
 
 export const LOGO = 'https://hapivet.com/assets/assets/hapivet-logo.c156a3856999f73b970c316513f6a567.png';
 
@@ -51,6 +53,9 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [sheet, setSheet] = useState(false);
   const { pathname } = useLocation();
+  const user = useUser();
+  const signIn = `/login?next=${encodeURIComponent(pathname)}`;
+  const accountLinks = user ? [['/my-bookings', 'My Demo Bookings'], ['/profile', 'Profile']] : [[signIn, 'Sign In']];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -76,8 +81,11 @@ export default function Navbar() {
             <Link to="/#achievements" className="nav-link">Achievements</Link>
           </nav>
           <div className="nav-cta">
-            <Link to="/admin" className="btn btn-ghost btn-sm">Sign In</Link>
+            {user
+              ? <Link to="/my-bookings" className="btn btn-ghost btn-sm nav-mine">My Demo Bookings</Link>
+              : <Link to={signIn} className="btn btn-ghost btn-sm">Sign In</Link>}
             <Link to="/demo" className="btn btn-dark btn-sm">Book a Demo</Link>
+            {user && <Link to="/profile" className="nav-avatar" aria-label={`Your profile, ${user.name}`} title={user.name}><Avatar name={user.name} /></Link>}
             <button className="nav-burger" aria-label="Open menu" onClick={() => setSheet(true)}><Menu /></button>
           </div>
         </div>
@@ -89,7 +97,7 @@ export default function Navbar() {
               <img src={LOGO} alt="HapiVet AI" height="30" style={{ height: 30 }} />
               <button className="nav-burger" aria-label="Close menu" onClick={() => setSheet(false)}><X /></button>
             </div>
-            {[['/', 'Home'], ['/#agents', 'AI Agents'], ['/#achievements', 'Achievements'], ['/pricing', 'Pricing'], ['/about', 'About'], ['/contact', 'Contact'], ['/admin', 'Sign In']].map(([to, label]) => (
+            {[['/', 'Home'], ['/#agents', 'AI Agents'], ['/#achievements', 'Achievements'], ['/pricing', 'Pricing'], ['/about', 'About'], ['/contact', 'Contact'], ...accountLinks].map(([to, label]) => (
               <Link key={label} to={to} onClick={() => setSheet(false)}>{label}</Link>
             ))}
             <Link to="/demo" className="btn btn-dark btn-lg" style={{ marginTop: 18, fontSize: 16, borderBottom: 0 }} onClick={() => setSheet(false)}>Book a Demo</Link>

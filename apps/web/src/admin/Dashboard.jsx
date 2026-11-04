@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useCollection } from '../lib/store';
-import { STATUSES, StatusPill, statusLabel } from './Leads';
+import { STATUSES, statusLabel } from '../lib/leads';
+import { StatusPill } from './Leads';
 
 const dateFmt = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
@@ -57,7 +58,7 @@ export default function Dashboard() {
 
       <div className="adm-tiles">
         <Tile label="Total leads" value={leads.length} />
-        <Tile label="New, not yet contacted" value={count('new')} />
+        <Tile label="Waiting to be contacted" value={count('new') + count('accepted')} note={`${count('new')} not yet accepted`} />
         <Tile label="Demos booked" value={count('demo-booked')} />
         <Tile label="Live content items" value={live} note={`${plans.length} pricing plans`} />
       </div>
@@ -76,8 +77,10 @@ export default function Dashboard() {
             <ul className="adm-recent">
               {recent.map((l) => (
                 <li key={l._id}>
-                  <div><b>{l.name}</b><small>{l.clinic} · {dateFmt(l.createdAt)}</small></div>
-                  <StatusPill status={l.status} />
+                  <Link to={`/admin/leads?lead=${l._id}`}>
+                    <div><b>{l.name}</b><small>{l.clinic} · {dateFmt(l.createdAt)}</small></div>
+                    <StatusPill status={l.status} />
+                  </Link>
                 </li>
               ))}
             </ul>

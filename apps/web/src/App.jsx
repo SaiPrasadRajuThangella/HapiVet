@@ -4,12 +4,18 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Lenis from 'lenis';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import { RequireUser } from './components/Account';
 import Home from './pages/Home';
 
 const Pricing = lazy(() => import('./pages/Pricing'));
 const About = lazy(() => import('./pages/About'));
 const Demo = lazy(() => import('./pages/Demo'));
+const Contact = lazy(() => import('./pages/Contact'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const Login = lazy(() => import('./pages/Login'));
+const Profile = lazy(() => import('./pages/Profile'));
+const MyBookings = lazy(() => import('./pages/MyBookings'));
+const BookingDetail = lazy(() => import('./pages/BookingDetail'));
 const Admin = lazy(() => import('./admin/AdminApp'));
 
 function SiteShell() {
@@ -31,7 +37,10 @@ function SiteShell() {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/about" element={<About />} />
               <Route path="/demo" element={<Demo />} />
-              <Route path="/contact" element={<Demo contact />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/profile" element={<RequireUser><Profile /></RequireUser>} />
+              <Route path="/my-bookings" element={<RequireUser><MyBookings /></RequireUser>} />
+              <Route path="/my-bookings/:id" element={<RequireUser><BookingDetail /></RequireUser>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
@@ -87,6 +96,7 @@ export default function App() {
     <Suspense fallback={<div className="page-loading" />}>
       <Routes>
         <Route path="/admin/*" element={<Admin />} />
+        <Route path="/login" element={<Login />} />
         <Route path="*" element={<SiteShell />} />
       </Routes>
     </Suspense>

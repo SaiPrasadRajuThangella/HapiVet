@@ -1,38 +1,13 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Counter } from '../components/ui';
+import PuppyStage from '../components/PuppyStage';
 import HeroTasks from './HeroTasks';
-import { unsplash } from '../lib/img';
 import { stats } from '../data/seed';
 import { useCollection } from '../lib/store';
 
-// Three.js is split into its own chunk and only loaded after the page is idle.
-const Scene3D = lazy(() => import('../components/Scene3D'));
-
-const hasWebGL = () => {
-  try {
-    const c = document.createElement('canvas');
-    return !!(window.WebGLRenderingContext && (c.getContext('webgl2') || c.getContext('webgl')));
-  } catch {
-    return false;
-  }
-};
-
-class SceneBoundary extends Component {
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
-  render() { return this.state.failed ? this.props.fallback : this.props.children; }
-}
-
-const Loading = <div className="stage-fallback"><i /></div>;
-// Only shown when WebGL is unavailable or the 3D scene fails to load.
-const Fallback = (
-  <div className="stage-fallback">
-    <img src={unsplash('1587300003388-59208cc962cb', 700)} alt="A happy dog smiling at the camera" decoding="async" />
-  </div>
-);
 const ease = [0.22, 1, 0.36, 1];
 
 function Words({ text, delay = 0, className }) {
@@ -57,16 +32,10 @@ function Words({ text, delay = 0, className }) {
 export default function Hero() {
   const settings = useCollection('settings');
   const ref = useRef(null);
-  const [mountScene, setMountScene] = useState(false);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const copyY = useTransform(scrollYProgress, [0, 1], [0, -90]);
   const stageY = useTransform(scrollYProgress, [0, 1], [0, 70]);
   const fade = useTransform(scrollYProgress, [0, 0.8], [1, 0.15]);
-
-  useEffect(() => {
-    const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
-    idle(() => setMountScene(hasWebGL() ? 'on' : 'off'));
-  }, []);
 
   return (
     <section className="hero" ref={ref}>
@@ -97,13 +66,7 @@ export default function Hero() {
         </motion.div>
 
         <motion.div className="hero-stage" style={{ y: stageY }}>
-          {!mountScene && Loading}
-          {mountScene === 'off' && Fallback}
-          {mountScene === 'on' && (
-            <SceneBoundary fallback={Fallback}>
-              <Suspense fallback={Loading}><Scene3D /></Suspense>
-            </SceneBoundary>
-          )}
+          <PuppyStage />
           <HeroTasks />
         </motion.div>
       </div>
