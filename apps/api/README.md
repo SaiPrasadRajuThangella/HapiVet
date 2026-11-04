@@ -1,34 +1,52 @@
-# HapiVet API (planned)
+# HapiVet API
 
-Express + MongoDB (Mongoose). Not built yet: the web app runs on mock data until this exists.
+Express + MongoDB (Mongoose). Serves the website and admin panel in `apps/web`.
+
+## Run it
+
+From the repo root, `npm run setup` once, then `npm run dev`. Without `MONGODB_URI` the API starts a local MongoDB, kept in `apps/api/.data` so data survives restarts. The first run downloads MongoDB once.
+
+Tests: `npm test`. They use their own temporary database.
+
+Environment variables are listed in `.env.example`.
 
 ## Collections
 
-These match the shapes in `apps/web/src/data/seed.js`:
+- `leads`: demo bookings and contact requests, with their status and history
+- `achievements`, `testimonials`, `plans`, `team`, and `settings` (a single document)
+- `users` (customers, by mobile number) and `admins`
 
-- `leads`, `achievements`, `testimonials`, `plans`, `team`
-- `settings` (a single document)
-- `users` (admin accounts with hashed passwords, plus customers signing in by mobile number)
+A new database starts with the website content from `src/data/seed.js`. Outside production it also gets sample leads.
 
 ## Endpoints
 
-| Method | Path | Access |
-| --- | --- | --- |
-| POST | `/api/auth/login` | Public, returns a JWT |
-| GET | `/api/achievements`, `/api/testimonials`, `/api/plans`, `/api/team`, `/api/settings` | Public |
-| POST | `/api/auth/otp/request`, `/api/auth/otp/verify` | Public, rate limited; replaces the mock `123456` code |
-| PATCH | `/api/me` | Customer, name only |
-| GET | `/api/me/bookings` | Customer, their own demo bookings |
-| POST | `/api/leads` | Public, rate limited; also books the slot on Cal.com |
-| GET | `/api/leads` | Admin |
-| POST, PATCH, DELETE | `/api/<collection>/:id` | Admin |
-| PATCH | `/api/settings` | Admin |
+| Method | Path | Access | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/health` | Public | For the host's health check |
+| POST | `/api/auth/otp` | Public, rate limited | `{ phone }`. No SMS provider yet, so it returns the fixed code as `demoCode` |
+| POST | `/api/auth/verify` | Public, rate limited | `{ phone, code, claim? }`. Creates the account on first sign-in. `claim` moves a guest booking onto it |
+| POST | `/api/auth/admin` | Public, rate limited | `{ email, password }` |
+| GET | `/api/me` | Customer | |
+| PATCH | `/api/me` | Customer | `{ name }`. Anything else is refused |
+| GET | `/api/me/bookings` | Customer | Their own demo bookings |
+| GET | `/api/leads/taken` | Public | Booked times only, for the calendar |
+| POST | `/api/leads` | Public, rate limited | A demo booking or contact request. Guests also get a `claimToken` |
+| GET | `/api/leads` | Admin | |
+| PATCH | `/api/leads/:id` | Admin | `{ status?, note?, slot?, meetingLink?, lostReason? }`. Status moves one stage at a time |
+| DELETE | `/api/leads/:id` | Admin | |
+| GET | `/api/events` | Customer or admin | Server-sent events: a `change` event when leads change, so open pages fetch again |
+| GET | `/api/achievements`, `/api/testimonials`, `/api/plans`, `/api/team`, `/api/settings` | Public | Visitors only get what's published |
+| POST, PATCH, DELETE | `/api/<collection>`, `/api/<collection>/:id` | Admin | |
+| PATCH | `/api/settings` | Admin | |
+| POST | `/api/admin/reset` | Admin | Back to the sample data. Refused in production |
 
-## Deploying to Render with MongoDB Atlas
+Two bookings can't take the same time: a unique index on `slotLock` makes the second one fail with a 409, and a lost lead lets its time go.
 
-For when the API is built:
+## Before real customers use it
 
-1. Create a free cluster on [MongoDB Atlas](https://www.mongodb.com/atlas), add a database user, allow network access from `0.0.0.0/0`, and copy the connection string.
-2. On [Render](https://render.com), create a **Web Service** from the GitHub repo with **Root Directory** `apps/api`, build command `npm install`, start command `npm start`.
-3. Add the environment variables: `NODE_ENV=production`, `MONGODB_URI`, a long random `JWT_SECRET`, your own `ADMIN_PASSWORD`, and `CORS_ORIGIN` set to the website's address.
-4. In Vercel, set `VITE_API_URL` to the Render address and redeploy the website.
+- **Sign-in codes.** Every number uses `FIXED_OTP`, and the login page shows it, so anyone can sign in as any number and see that number's bookings. Connect an SMS provider in `src/routes/auth.js` first.
+- **More than one server.** Live updates (`src/lib/events.js`) run inside one process. Running several instances would need Redis or similar.
+
+## Deploying
+
+The repo's main README has the full order of steps. On Render, use **Root Directory** `apps/api`, build command `npm install`, start command `npm start`.

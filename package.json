@@ -2,10 +2,19 @@
   "name": "hapivet-monorepo",
   "private": true,
   "version": "0.1.0",
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/web"
+  ],
   "scripts": {
-    "dev": "npm run dev -w apps/web",
+    "setup": "npm install && npm install --prefix apps/api",
+    "dev": "concurrently --names api,web --prefix-colors green,blue \"npm run dev --prefix apps/api\" \"npm run dev -w apps/web\"",
+    "dev:web": "npm run dev -w apps/web",
+    "dev:api": "npm run dev --prefix apps/api",
+    "test": "npm test --prefix apps/api",
     "build": "npm run build -w apps/web",
     "preview": "npm run preview -w apps/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
   }
 }
