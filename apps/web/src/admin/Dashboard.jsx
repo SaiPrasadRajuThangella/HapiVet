@@ -52,7 +52,7 @@ export default function Dashboard() {
       <header className="adm-head">
         <div>
           <h1>Dashboard</h1>
-          <p>Demo requests and what’s live on the website. Lead data is sample data until the API is connected.</p>
+          <p>Demo requests and what’s live on the website.</p>
         </div>
       </header>
 

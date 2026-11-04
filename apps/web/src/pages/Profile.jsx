@@ -30,13 +30,18 @@ export default function Profile() {
     return () => clearTimeout(t);
   }, [saved]);
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     if (name.trim().length < 2) { setError('Please enter your name'); return; }
     setError('');
-    userAuth.update({ name: name.trim() });
-    setName(name.trim());
-    setSaved(true);
+    try {
+      await userAuth.update({ name: name.trim() });
+      setName(name.trim());
+      setSaved(true);
+    } catch (err) {
+      if (err.status === 401) userAuth.logout();
+      else setError(err.message);
+    }
   };
 
   return (

@@ -1,6 +1,6 @@
 // The lead pipeline. The admin panel moves leads through it; My Demo Bookings shows customers where theirs is.
-import { useMemo } from 'react';
-import { db, useCollection } from './store';
+import { useCallback, useEffect, useState } from 'react';
+import { db, request, useLive, userAuth } from './store';
 
 // The path a lead takes. It can drop out to Lost from any of them.
 export const STAGES = ['new', 'accepted', 'contacted', 'demo-booked', 'won'];
@@ -31,14 +31,39 @@ export const reachedStage = (lead) => {
   return [...historyOf(lead)].reverse().find((h) => h.status !== 'lost')?.status ?? 'new';
 };
 
-export function moveLead(lead, status, patch = {}) {
-  db.update('leads', lead._id, { ...patch, status, history: [...historyOf(lead), { status, at: new Date().toISOString() }] });
+// The history here is only for showing the move straight away; the API records the real one.
+export const moveLead = (lead, status, patch = {}) => db.update('leads', lead._id, {
+  ...patch,
+  status,
+  history: [...historyOf(lead), { status, at: new Date().toISOString() }],
+});
+
+// The signed-in customer's demo bookings, kept up to date while the page is open.
+export function useMyBookings() {
+  const token = userAuth.token();
+  const [bookings, setBookings] = useState(null);
+  const [error, setError] = useState('');
+
+  const refresh = useCallback(() => request('/me/bookings', { token })
+    .then((list) => {
+      setBookings(list);
+      setError('');
+    })
+    .catch((err) => {
+      if (err.status === 401) userAuth.logout();
+      else setError(err.message);
+    }), [token]);
+
+  useEffect(() => { refresh(); }, [refresh]);
+  useLive(token, refresh);
+
+  return { bookings: bookings ?? [], loading: bookings === null && !error, error };
 }
 
-// Demo bookings belong to the number they were booked from, or the number given on the form.
-const isMine = (lead, user) => lead.type !== 'contact' && (lead.userPhone === user.phone || lead.phone === user.phone);
-
-export function useMyBookings(user) {
-  const leads = useCollection('leads');
-  return useMemo(() => leads.filter((l) => isMine(l, user)), [leads, user]);
+// Times already booked on this site, which Cal.com doesn't know about.
+export function useTakenSlots() {
+  const [taken, setTaken] = useState([]);
+  const refresh = useCallback(() => request('/leads/taken').then(setTaken).catch(() => {}), []);
+  useEffect(() => { refresh(); }, [refresh]);
+  return { taken, refreshTaken: refresh };
 }

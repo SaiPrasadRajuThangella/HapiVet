@@ -144,7 +144,8 @@ a.adm-contact:hover { background: var(--blue-mist); border-color: var(--blue-mis
 .adm-activity { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 13.5px; }
 .adm-activity li { display: flex; justify-content: space-between; gap: 12px; }
 .adm-activity time { color: var(--gray-500); font-variant-numeric: tabular-nums; }
-.adm-toast { left: auto; right: 26px; z-index: 90; }
+.ac-toast.adm-toast { left: auto; right: 20px; z-index: 90; white-space: normal; max-width: min(420px, calc(100% - 40px)); border-radius: 16px; }
+.ac-toast.adm-toast-error { background: #a33a3a; bottom: 84px; }
 
 .adm-form { display: grid; gap: 16px; max-width: 720px; }
 .adm-form-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 4px; }

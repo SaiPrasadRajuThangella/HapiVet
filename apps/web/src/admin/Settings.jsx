@@ -18,9 +18,9 @@ export default function Settings() {
 
   useEffect(() => setForm(settings), [settings]);
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
-    db.setObject('settings', form);
+    if (!(await db.setObject('settings', form))) return;
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
@@ -50,7 +50,8 @@ export default function Settings() {
         <div className="adm-form-foot">
           <button className="btn btn-dark btn-sm" type="submit">Save changes</button>
           {saved && <span role="status" className="muted" style={{ fontSize: 14 }}>Saved</span>}
-          <button className="btn btn-light btn-sm" type="button" style={{ marginLeft: 'auto' }} onClick={reset}>Reset sample data</button>
+          {/* Wipes every lead, so the API refuses it on the live site and the button stays local. */}
+          {import.meta.env.DEV && <button className="btn btn-light btn-sm" type="button" style={{ marginLeft: 'auto' }} onClick={reset}>Reset sample data</button>}
         </div>
       </form>
     </>

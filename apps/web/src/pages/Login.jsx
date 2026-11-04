@@ -6,7 +6,7 @@ import { LOGO } from '../components/Navbar';
 import PhoneInput from '../components/PhoneInput';
 import PuppyStage from '../components/PuppyStage';
 import { stats } from '../data/seed';
-import { db, DEMO_OTP, useCollection, userAuth, useUser } from '../lib/store';
+import { useCollection, userAuth, useUser } from '../lib/store';
 import { defaultDial, isValidNumber } from '../lib/phone';
 
 // Only same-site paths, so ?next= can't send people elsewhere.
@@ -82,26 +82,42 @@ export default function Login() {
   const [dial, setDial] = useState(defaultDial);
   const [number, setNumber] = useState('');
   const [code, setCode] = useState('');
+  const [demoCode, setDemoCode] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   if (user) return <Navigate to={next} replace />;
 
   const phone = `${dial}${number}`;
 
-  const sendCode = (e) => {
+  const sendCode = async (e) => {
     e.preventDefault();
     if (!isValidNumber(number)) { setError('Please enter a valid mobile number'); return; }
     setError('');
-    setCode('');
-    setStep('code');
+    setBusy(true);
+    try {
+      const res = await userAuth.requestCode(phone);
+      setDemoCode(res.demoCode ?? '');
+      setCode('');
+      setStep('code');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const verify = (value) => {
-    // A booking made before signing in moves onto this account.
-    if (value === DEMO_OTP && state?.claim) db.update('leads', state.claim, { userPhone: phone });
-    if (userAuth.login(phone, value)) return;
-    setError('That code isn’t right. Please try again.');
-    setCode('');
+  // A booking made before signing in moves onto this account (state.claim). Success redirects above.
+  const verify = async (value) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await userAuth.verify(phone, value, state?.claim);
+    } catch (err) {
+      setError(err.message);
+      setCode('');
+      setBusy(false);
+    }
   };
 
   return (
@@ -130,7 +146,7 @@ export default function Login() {
                   <PhoneInput id="lg-phone" autoFocus dial={dial} number={number} invalid={!!error} onDial={setDial} onNumber={(v) => { setNumber(v); setError(''); }} />
                   {error && <small role="alert">{error}</small>}
                 </div>
-                <button type="submit" className="btn btn-dark btn-lg lg-submit">Send code <ArrowRight size={17} /></button>
+                <button type="submit" className="btn btn-dark btn-lg lg-submit" disabled={busy}>{busy ? 'Sending…' : <>Send code <ArrowRight size={17} /></>}</button>
               </form>
             ) : (
               <form onSubmit={(e) => { e.preventDefault(); if (code.length === 6) verify(code); }} noValidate>
@@ -141,8 +157,8 @@ export default function Login() {
                   <CodeInput value={code} invalid={!!error} onChange={(v) => { setCode(v); setError(''); if (v.length === 6) verify(v); }} />
                   {error && <small role="alert">{error}</small>}
                 </div>
-                <p className="lg-hint"><MessageSquareText size={17} /><span>Demo mode, no SMS is sent yet. Your code is <b>{DEMO_OTP}</b>.</span></p>
-                <button type="submit" className="btn btn-dark btn-lg lg-submit" disabled={code.length < 6}>Verify and continue</button>
+                {demoCode && <p className="lg-hint"><MessageSquareText size={17} /><span>Demo mode, no SMS is sent yet. Your code is <b>{demoCode}</b>.</span></p>}
+                <button type="submit" className="btn btn-dark btn-lg lg-submit" disabled={code.length < 6 || busy}>{busy ? 'Verifying…' : 'Verify and continue'}</button>
               </form>
             )}
           </motion.div>

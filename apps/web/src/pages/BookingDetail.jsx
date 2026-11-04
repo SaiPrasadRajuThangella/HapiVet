@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, Check, SearchX, Video, X } from 'lucide-react';
 import { AccountLayout } from '../components/Account';
 import { CustomerPill } from './MyBookings';
-import { useUser } from '../lib/store';
 import { customerLabel, reachedStage, STAGES, stageTime, useMyBookings } from '../lib/leads';
 import { EVENT, formatDate, formatStamp, formatTime, slotEnd, zoneName } from '../lib/slots';
 import { formatPhone } from '../lib/phone';
@@ -86,8 +85,7 @@ const safeLink = (url) => (/^https?:\/\//i.test(url || '') ? url : null);
 
 export default function BookingDetail() {
   const { id } = useParams();
-  const user = useUser();
-  const bookings = useMyBookings(user);
+  const { bookings, loading, error } = useMyBookings();
   const lead = bookings.find((b) => b._id === id);
   const [toast, setToast] = useState('');
   const status = lead?.status;
@@ -95,9 +93,8 @@ export default function BookingDetail() {
 
   // The admin panel moved this booking while it was open.
   useEffect(() => {
-    if (!status || shown.current === status) return;
+    if (shown.current && status && shown.current !== status) setToast(`Updated just now: ${customerLabel(status)}`);
     shown.current = status;
-    setToast(`Updated just now: ${customerLabel(status)}`);
   }, [status]);
 
   useEffect(() => {
@@ -105,6 +102,9 @@ export default function BookingDetail() {
     const t = setTimeout(() => setToast(''), 3500);
     return () => clearTimeout(t);
   }, [toast]);
+
+  if (loading) return <AccountLayout><div className="ac-card ac-loading" aria-busy="true" /></AccountLayout>;
+  if (error && !lead) return <AccountLayout><p className="ac-card ac-error" role="alert">{error}</p></AccountLayout>;
 
   if (!lead) {
     return (

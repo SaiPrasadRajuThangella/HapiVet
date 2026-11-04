@@ -1,5 +1,5 @@
 // Demo slots. They come from HapiVet's Cal.com event, the same source as the calendar on hapivet.com/demo,
-// so the times here match the live site. Bookings themselves stay in the mock store until the API exists.
+// so the times here match the live site. Bookings are saved by our own API and don't reach Cal.com.
 import { useEffect, useState } from 'react';
 
 export const EVENT = {

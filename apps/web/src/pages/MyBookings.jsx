@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarPlus, ChevronRight } from 'lucide-react';
 import { AccountLayout } from '../components/Account';
-import { useUser } from '../lib/store';
 import { customerLabel, reachedStage, STAGES, useMyBookings } from '../lib/leads';
 import { EVENT, formatShortDate, formatTime } from '../lib/slots';
 
@@ -40,8 +39,7 @@ function BookingCard({ lead }) {
 }
 
 export default function MyBookings() {
-  const user = useUser();
-  const bookings = useMyBookings(user);
+  const { bookings, loading, error } = useMyBookings();
   const sorted = [...bookings].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
   const active = sorted.filter((b) => b.status !== 'won' && b.status !== 'lost');
   const past = sorted.filter((b) => b.status === 'won' || b.status === 'lost');
@@ -55,19 +53,18 @@ export default function MyBookings() {
         </div>
         {sorted.length > 0 && <Link to="/demo" className="btn btn-dark btn-sm">Book another demo</Link>}
       </header>
-      {sorted.length === 0 ? (
+      {error && <p className="ac-card ac-error" role="alert">{error}</p>}
+      {loading && <div className="ac-card ac-loading" aria-busy="true" />}
+      {!loading && !error && sorted.length === 0 && (
         <div className="ac-card ac-empty">
           <span><CalendarPlus size={26} /></span>
           <h3>No demo bookings yet</h3>
           <p className="muted">Pick a time that suits you and it shows up here, with every step as it happens.</p>
           <Link to="/demo" className="btn btn-dark btn-sm">Book a Demo <ArrowRight size={15} /></Link>
         </div>
-      ) : (
-        <>
-          {active.length > 0 && <section className="ac-group"><h2>In progress <span>{active.length}</span></h2>{active.map((b) => <BookingCard key={b._id} lead={b} />)}</section>}
-          {past.length > 0 && <section className="ac-group"><h2>Past <span>{past.length}</span></h2>{past.map((b) => <BookingCard key={b._id} lead={b} />)}</section>}
-        </>
       )}
+      {active.length > 0 && <section className="ac-group"><h2>In progress <span>{active.length}</span></h2>{active.map((b) => <BookingCard key={b._id} lead={b} />)}</section>}
+      {past.length > 0 && <section className="ac-group"><h2>Past <span>{past.length}</span></h2>{past.map((b) => <BookingCard key={b._id} lead={b} />)}</section>}
     </AccountLayout>
   );
 }

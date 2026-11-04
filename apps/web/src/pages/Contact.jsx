@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Mail } from 'lucide-react';
 import { Reveal, Tick } from '../components/ui';
-import { db, useCollection } from '../lib/store';
+import { request, useCollection } from '../lib/store';
 
 const empty = { name: '', email: '', clinic: '', size: 'Solo', message: '' };
 
@@ -12,10 +12,11 @@ export default function Contact() {
   const [form, setForm] = useState(empty);
   const [errors, setErrors] = useState({});
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const next = {};
     if (!form.name.trim()) next.name = 'Please enter your name';
@@ -23,8 +24,15 @@ export default function Contact() {
     if (!form.clinic.trim()) next.clinic = 'Please enter your clinic name';
     setErrors(next);
     if (Object.keys(next).length) return;
-    db.create('leads', { ...form, type: 'contact', status: 'new', history: [{ status: 'new', at: new Date().toISOString() }] });
-    setSent(true);
+    setBusy(true);
+    try {
+      await request('/leads', { method: 'POST', body: { ...form, type: 'contact' } });
+      setSent(true);
+    } catch (err) {
+      setErrors({ form: err.message });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -77,7 +85,8 @@ export default function Contact() {
                       <label htmlFor="message">How can we help?</label>
                       <textarea id="message" rows="4" value={form.message} onChange={set('message')} />
                     </div>
-                    <button className="btn btn-dark btn-lg" type="submit">Send message <ArrowRight size={17} /></button>
+                    {errors.form && <small role="alert" style={{ color: '#a33a3a' }}>{errors.form}</small>}
+                    <button className="btn btn-dark btn-lg" type="submit" disabled={busy}>{busy ? 'Sending…' : <>Send message <ArrowRight size={17} /></>}</button>
                   </motion.form>
                 )}
               </AnimatePresence>

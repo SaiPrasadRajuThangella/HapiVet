@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Award, DollarSign, ExternalLink, Inbox, LayoutDashboard, LogOut, MessageSquareQuote, Settings as SettingsIcon, Users } from 'lucide-react';
-import { auth, useAuth } from '../lib/store';
+import { adminToken, auth, clearApiError, refresh, useApiError, useAuth, useLive } from '../lib/store';
 import { LOGO } from '../components/Navbar';
 import Dashboard from './Dashboard';
 import Leads from './Leads';
@@ -59,10 +60,18 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (!auth.login(email, password)) setError('That email and password don’t match.');
+    setError('');
+    setBusy(true);
+    try {
+      await auth.login(email, password);
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
   };
 
   return (
@@ -82,16 +91,38 @@ function Login() {
           <input id="adm-password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
         {error && <p role="alert" style={{ color: '#a33a3a', fontSize: 14 }}>{error}</p>}
-        <button className="btn btn-dark" type="submit">Sign in</button>
+        <button className="btn btn-dark" type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
         <Link to="/" className="muted" style={{ fontSize: 14, textAlign: 'center' }}>Back to website</Link>
       </form>
     </div>
   );
 }
 
+const refreshLeads = () => refresh('leads');
+
+function ApiErrorToast() {
+  const error = useApiError();
+  useEffect(() => {
+    if (!error) return undefined;
+    const t = setTimeout(clearApiError, 5000);
+    return () => clearTimeout(t);
+  }, [error]);
+  return (
+    <AnimatePresence>
+      {error && <motion.div className="ac-toast adm-toast adm-toast-error" role="alert" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}>{error}</motion.div>}
+    </AnimatePresence>
+  );
+}
+
 export default function AdminApp() {
   const session = useAuth();
   if (!session) return <Login />;
+  return <Panel />;
+}
+
+function Panel() {
+  // New bookings and changes from another admin tab show up straight away.
+  useLive(adminToken(), refreshLeads);
 
   return (
     <div className="adm">
@@ -169,6 +200,7 @@ export default function AdminApp() {
           <Route path="settings" element={<Settings />} />
         </Routes>
       </main>
+      <ApiErrorToast />
     </div>
   );
 }

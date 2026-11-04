@@ -64,9 +64,8 @@ export default function LeadDrawer({ lead, onClose, onToast }) {
 
   const dirty = trimmedNote !== (lead.note ?? '') || (showsDemoFields && (when !== toLocalInput(lead.slot) || link.trim() !== (lead.meetingLink ?? '')));
 
-  const move = (status, message, extra = {}) => {
-    moveLead(lead, status, { ...details(), ...extra });
-    onToast(message);
+  const move = async (status, message, extra = {}) => {
+    if (await moveLead(lead, status, { ...details(), ...extra })) onToast(message);
   };
 
   const advance = () => {
@@ -81,15 +80,13 @@ export default function LeadDrawer({ lead, onClose, onToast }) {
     setReason('');
   };
 
-  const reopen = () => {
+  const reopen = async () => {
     const to = lead.status === 'won' ? 'demo-booked' : reachedStage(lead);
-    moveLead(lead, to, { lostReason: '' });
-    onToast(`${lead.name} reopened at ${statusLabel(to).toLowerCase()}`);
+    if (await moveLead(lead, to, { lostReason: '' })) onToast(`${lead.name} reopened at ${statusLabel(to).toLowerCase()}`);
   };
 
-  const save = () => {
-    db.update('leads', lead._id, details());
-    onToast('Saved for the customer');
+  const save = async () => {
+    if (await db.update('leads', lead._id, details())) onToast('Saved for the customer');
   };
 
   const remove = () => {

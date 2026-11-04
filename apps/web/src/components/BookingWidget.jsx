@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CalendarDays, Check, ChevronLeft, ChevronRight, Clock, Globe, Link2, Plus, UserPlus, X } from 'lucide-react';
 import PhoneInput from './PhoneInput';
-import { db, useCollection, useUser } from '../lib/store';
+import { request, userAuth, useUser } from '../lib/store';
+import { useTakenSlots } from '../lib/leads';
 import { digitsOnly, isValidNumber, splitPhone } from '../lib/phone';
 import {
   EVENT, MIN_NOTICE_MS, addMonths, allZones, browserZone, dayHeading, dayKey, formatDate, formatTime,
@@ -106,7 +107,7 @@ function TimeList({ days, day, zone, hour12, onHour12, onSlot, onNextMonth }) {
       {days && !day && (
         <div className="bk-none">
           <p>No available times this month.</p>
-          <button type="button" onClick={onNextMonth}>View next month</button>
+          <button type="button" className="btn btn-sky btn-sm" onClick={onNextMonth}>View next month</button>
         </div>
       )}
       {days && day && (
@@ -121,17 +122,17 @@ function TimeList({ days, day, zone, hour12, onHour12, onSlot, onNextMonth }) {
 
 function Field({ id, label, required, error, children, ...input }) {
   return (
-    <div className="bk-field">
-      <label htmlFor={id}>{label}{required && <em> *</em>}</label>
+    <div className="field">
+      <label htmlFor={id}>{label}{required && ' *'}</label>
       {children || <input id={id} aria-invalid={!!error} {...input} />}
       {error && <small role="alert">{error}</small>}
     </div>
   );
 }
 
-function DetailsForm({ slot, zone, onBack, onBooked }) {
+function DetailsForm({ slot, zone, onBack, onBooked, onTaken }) {
   const user = useUser();
-  const leads = useCollection('leads');
+  const [busy, setBusy] = useState(false);
   const [form, setForm] = useState(() => {
     const { dial, number } = splitPhone(user?.phone);
     return { name: user?.name ?? '', email: user?.email ?? '', dial, number, company: '', jobTitle: '', city: '' };
@@ -141,7 +142,7 @@ function DetailsForm({ slot, zone, onBack, onBooked }) {
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const next = {};
     const number = digitsOnly(form.number);
@@ -153,30 +154,36 @@ function DetailsForm({ slot, zone, onBack, onBooked }) {
     if (!form.city.trim()) next.city = 'Please enter your city and state';
     const invited = guests.map((g) => g.trim()).filter(Boolean);
     if (invited.some((g) => !isEmail(g))) next.guests = 'Please check the guest email addresses';
-    if (leads.some((l) => l.slot === slot && l.status !== 'lost')) next.slot = 'Someone just took this time. Please go back and pick another.';
     setErrors(next);
     if (Object.keys(next).length) return;
-    const at = new Date().toISOString();
-    onBooked(db.create('leads', {
-      type: 'demo',
-      status: 'new',
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: number ? `${form.dial}${number}` : '',
-      clinic: form.company.trim(),
-      jobTitle: form.jobTitle.trim(),
-      city: form.city.trim(),
-      guests: invited,
-      slot,
-      timeZone: zone,
-      message: '',
-      ...(user ? { userPhone: user.phone } : {}),
-      history: [{ status: 'new', at }],
-    }));
+    setBusy(true);
+    try {
+      onBooked(await request('/leads', {
+        method: 'POST',
+        token: userAuth.token(),
+        body: {
+          type: 'demo',
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: number ? `${form.dial}${number}` : '',
+          clinic: form.company.trim(),
+          jobTitle: form.jobTitle.trim(),
+          city: form.city.trim(),
+          guests: invited,
+          slot,
+          timeZone: zone,
+        },
+      }));
+    } catch (err) {
+      if (err.status === 409) onTaken();
+      setErrors({ form: err.message });
+      setBusy(false);
+    }
   };
 
   return (
     <form className="bk-form" onSubmit={submit} noValidate>
+      <h3>Your details</h3>
       <Field id="bk-name" label="Your name" required error={errors.name} value={form.name} onChange={set('name')} autoComplete="name" />
       <Field id="bk-email" label="Email address" required error={errors.email} type="email" value={form.email} onChange={set('email')} autoComplete="email" />
       <Field label="Phone number" id="bk-phone" error={errors.number}>
@@ -186,8 +193,8 @@ function DetailsForm({ slot, zone, onBack, onBooked }) {
       <Field id="bk-title" label="Job Title" required error={errors.jobTitle} placeholder="Practice Manager" value={form.jobTitle} onChange={set('jobTitle')} autoComplete="organization-title" />
       <Field id="bk-city" label="City/State" required error={errors.city} placeholder="Los Angeles, CA" value={form.city} onChange={set('city')} autoComplete="address-level2" />
       {guests.length > 0 && (
-        <div className="bk-field">
-          <label htmlFor="bk-guest-0">Add guests</label>
+        <div className="field bk-wide">
+          <label htmlFor="bk-guest-0">Guests</label>
           {guests.map((g, i) => (
             <div className="bk-guest" key={i}>
               <input id={`bk-guest-${i}`} type="email" placeholder="Email" aria-label={`Guest ${i + 1} email`} value={g} onChange={(e) => setGuests((all) => all.map((x, j) => (j === i ? e.target.value : x)))} />
@@ -197,19 +204,19 @@ function DetailsForm({ slot, zone, onBack, onBooked }) {
           {errors.guests && <small role="alert">{errors.guests}</small>}
         </div>
       )}
-      <button type="button" className="bk-add" onClick={() => setGuests((all) => [...all, ''])}>
+      <button type="button" className="bk-add bk-wide" onClick={() => setGuests((all) => [...all, ''])}>
         {guests.length ? <Plus size={15} /> : <UserPlus size={15} />} {guests.length ? 'Add another' : 'Add guests'}
       </button>
-      {errors.slot && <small className="bk-form-error" role="alert">{errors.slot}</small>}
-      <div className="bk-form-foot">
-        <button type="button" className="bk-back" onClick={onBack}>Back</button>
-        <button type="submit" className="bk-confirm">Confirm</button>
+      {errors.form && <small className="bk-wide" role="alert">{errors.form}</small>}
+      <div className="bk-form-foot bk-wide">
+        <button type="button" className="btn btn-light btn-sm" onClick={onBack}>Back</button>
+        <button type="submit" className="btn btn-sky btn-sm" disabled={busy}>{busy ? 'Confirming…' : 'Confirm'}</button>
       </div>
     </form>
   );
 }
 
-function Confirmed({ lead, zone }) {
+function Confirmed({ lead, claimToken, zone }) {
   const user = useUser();
   const rows = [
     ['What', `${EVENT.title} between ${EVENT.team} and ${lead.name}`],
@@ -235,14 +242,14 @@ function Confirmed({ lead, zone }) {
         ))}
       </dl>
       {user
-        ? <Link className="bk-confirm" to={`/my-bookings/${lead._id}`}>Track this booking</Link>
-        : <Link className="bk-confirm" to={`/login?next=/my-bookings/${lead._id}`} state={{ claim: lead._id }}>Sign in to track this booking</Link>}
+        ? <Link className="btn btn-sky btn-sm" to={`/my-bookings/${lead._id}`}>Track this booking</Link>
+        : <Link className="btn btn-sky btn-sm" to={`/login?next=/my-bookings/${lead._id}`} state={{ claim: claimToken }}>Sign in to track this booking</Link>}
     </div>
   );
 }
 
 export default function BookingWidget() {
-  const leads = useCollection('leads');
+  const { taken, refreshTaken } = useTakenSlots();
   const [zone, setZone] = useState(browserZone);
   const [month, setMonth] = useState(() => monthOf(Date.now(), browserZone()));
   const [picked, setPicked] = useState(null);
@@ -256,15 +263,15 @@ export default function BookingWidget() {
   // Cal.com doesn't know about bookings made here, so those times are taken out on this side.
   const days = useMemo(() => {
     if (!slots) return null;
-    const taken = new Set(leads.filter((l) => l.slot && l.status !== 'lost').map((l) => l.slot));
+    const booked = new Set(taken);
     const earliest = Date.now() + MIN_NOTICE_MS;
     const open = {};
     Object.entries(slots).forEach(([key, times]) => {
-      const free = times.filter((t) => !taken.has(t) && new Date(t).getTime() >= earliest);
+      const free = times.filter((t) => !booked.has(t) && new Date(t).getTime() >= earliest);
       if (free.length) open[key] = free;
     });
     return open;
-  }, [slots, leads]);
+  }, [slots, taken]);
 
   // Like the live calendar, the first open day of the month is selected until another is picked.
   const firstOpen = days ? Object.keys(days).sort()[0] : null;
@@ -300,10 +307,10 @@ export default function BookingWidget() {
         {step === 'form' && (
           <>
             <EventInfo slot={slot} zone={zone} />
-            <DetailsForm slot={slot} zone={zone} onBack={() => setSlot(null)} onBooked={setBooked} />
+            <DetailsForm slot={slot} zone={zone} onBack={() => setSlot(null)} onBooked={setBooked} onTaken={refreshTaken} />
           </>
         )}
-        {step === 'done' && <Confirmed lead={booked} zone={zone} />}
+        {step === 'done' && <Confirmed lead={booked.lead} claimToken={booked.claimToken} zone={zone} />}
       </motion.div>
     </AnimatePresence>
   );

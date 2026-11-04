@@ -62,7 +62,7 @@ export default function ResourcePage({ name, title, subtitle, singular, fields, 
     setEditing({ id: doc?._id || null, form: toForm(fields, doc || defaults) });
   };
 
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     const next = {};
     fields.forEach((f) => {
@@ -71,9 +71,9 @@ export default function ResourcePage({ name, title, subtitle, singular, fields, 
     setErrors(next);
     if (Object.keys(next).length) return;
     const doc = fromForm(fields, editing.form);
-    if (editing.id) db.update(name, editing.id, doc);
-    else db.create(name, doc);
-    setEditing(null);
+    // Stays open if the API refuses it, so nothing typed is lost.
+    const saved = await (editing.id ? db.update(name, editing.id, doc) : db.create(name, doc));
+    if (saved) setEditing(null);
   };
 
   return (
