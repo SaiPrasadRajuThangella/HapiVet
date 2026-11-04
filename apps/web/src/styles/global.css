@@ -159,7 +159,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .agent-panel.on { flex-grow: 5; }
 .agent-panel.dark { --tone: #fff; --tone-soft: rgba(255, 255, 255, 0.92); --tone-ghost: rgba(255, 255, 255, 0.5); --line: rgba(255, 255, 255, 0.24); --glow: rgba(15, 34, 51, 0.45); }
 .agent-panel.light { --tone: var(--ink); --tone-soft: rgba(15, 34, 51, 0.88); --tone-ghost: rgba(15, 34, 51, 0.32); --line: rgba(15, 34, 51, 0.18); --glow: rgba(255, 255, 255, 0.85); }
-.agent-hit { position: absolute; inset: 0; z-index: 4; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; transition: background 0.25s; }
+.agent-hit { position: absolute; inset: 0; z-index: 4; width: 100%; padding: 0; border: 0; background: none; cursor: default; transition: background 0.25s; }
 .agent-hit:hover { background: rgba(255, 255, 255, 0.08); }
 .agent-hit:focus-visible { outline: 3px solid var(--tone); outline-offset: -8px; border-radius: 0; }
 .on .agent-hit { z-index: 0; pointer-events: none; }

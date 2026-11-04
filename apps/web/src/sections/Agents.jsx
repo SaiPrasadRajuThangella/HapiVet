@@ -17,6 +17,7 @@ function Panel({ agent, index, on, onSelect, bodyRef }) {
     <article
       className={`agent-panel ${TINTS[index] > 0.7 ? 'dark' : 'light'}${on ? ' on' : ''}`}
       style={{ '--alpha': TINTS[index] }}
+      onPointerEnter={(e) => { if (e.pointerType === 'mouse') onSelect(); }}
     >
       <button
         type="button"
