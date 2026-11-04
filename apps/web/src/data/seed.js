@@ -80,6 +80,7 @@ export const analyticsFeatures = [
   ['Wait Time Tracking', 'Monitor and reduce pet parent wait times'],
   ['Capacity Utilization', 'See appointment slots used vs available in real time'],
   ['Historical Trends', 'Analyze patterns for better staff scheduling'],
+  ['Smart Scheduling Insights', 'AI recommendations for optimal staffing levels'],
   ['Zero Wait Reports', 'Revenue, inventory, controlled substances — instantly'],
 ];
 
@@ -88,6 +89,7 @@ export const revenueFeatures = [
   ['Flexible Payments', 'Split payments and payment plans built-in'],
   ['Declined Estimate Tracking', 'Follow up on declined estimates automatically'],
   ['Revenue Analytics', 'Deep insights into practice profitability'],
+  ['Capacity Insights', 'Understand client ability to pay for treatment'],
 ];
 
 export const platform = [
