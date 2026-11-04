@@ -112,23 +112,33 @@ h1, h2, h3, h4, p { margin: 0; }
 .hero-stats div > span { font-size: 13px; color: var(--gray-700); }
 .hero-stage { position: relative; height: min(70vh, 640px); min-height: 420px; }
 .hero-stage canvas { touch-action: pan-y; }
-.stage-fallback { position: absolute; inset: 0; display: grid; place-items: center; }
+.stage-fallback { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; }
 .stage-fallback i { width: 55%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent 70%); animation: float 6s ease-in-out infinite; }
 .stage-fallback img { width: min(72%, 400px); aspect-ratio: 1; object-fit: cover; border-radius: 50%; box-shadow: var(--shadow-lg); animation: float 6s ease-in-out infinite; }
 @keyframes float { 50% { transform: translateY(-14px); } }
-.float-card { position: absolute; background: rgba(255, 255, 255, 0.94); border-radius: 16px; padding: 12px 16px; box-shadow: var(--shadow); font-size: 13px; display: flex; gap: 10px; align-items: center; max-width: 260px; z-index: 3; }
-.float-card .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--navy); color: #fff; flex: none; }
-.float-card b { display: block; font-size: 13px; }
-.float-card small { color: var(--gray-500); font-size: 12px; }
+.task-orbit { position: absolute; inset: 0; pointer-events: none; }
+.task-orbit ul { list-style: none; margin: 0; padding: 0; }
+.task-label { position: absolute; top: -7%; left: 50%; translate: -50% 0; z-index: 3; margin: 0; white-space: nowrap; background: rgba(255, 255, 255, 0.78); backdrop-filter: none; }
+.task-card { position: absolute; top: 50%; left: 50%; width: 250px; opacity: 0; background: rgba(255, 255, 255, 0.96); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); font-size: 13px; line-height: 1.35; display: flex; gap: 10px; align-items: center; pointer-events: auto; will-change: transform; }
+.task-card .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--navy); color: #fff; flex: none; }
+.task-card b { display: block; font-size: 13px; }
+.task-card small { display: block; margin-top: 2px; color: var(--gray-500); font-size: 12px; }
+@media (max-width: 1200px) { .task-card { width: 214px; } }
 .scroll-hint { position: absolute; bottom: 24px; left: 50%; translate: -50% 0; color: var(--ink-2); display: grid; justify-items: center; gap: 6px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
 .scroll-hint i { width: 1.5px; height: 34px; background: linear-gradient(var(--ink-2), transparent); animation: drip 1.8s infinite; transform-origin: top; }
 @keyframes drip { 0% { transform: scaleY(0); } 60% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
-@media (max-width: 960px) {
+@media (max-width: 1100px) {
   .hero-grid { grid-template-columns: 1fr; }
-  .hero-stage { height: 46vh; min-height: 320px; margin-top: 8px; }
+  .hero-stage { height: 52vh; min-height: 400px; margin-top: 28px; }
   .hero { padding-top: 90px; }
-  .float-card { display: none; }
+  .task-label { top: -4%; }
   .scroll-hint { display: none; }
+}
+@media (max-width: 600px) {
+  .task-card { width: 186px; padding: 9px 11px; gap: 8px; }
+  .task-card .ic { width: 28px; height: 28px; border-radius: 8px; }
+  .task-card b { font-size: 12px; }
+  .task-card small { font-size: 11px; }
 }
 
 /* ---------- marquee ---------- */

@@ -1,8 +1,9 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, CircleDollarSign, FileText, Phone } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Counter } from '../components/ui';
+import HeroTasks from './HeroTasks';
 import { unsplash } from '../lib/img';
 import { stats } from '../data/seed';
 import { useCollection } from '../lib/store';
@@ -50,25 +51,6 @@ function Words({ text, delay = 0, className }) {
         </span>
       ))}
     </span>
-  );
-}
-
-function FloatCard({ icon: Icon, title, sub, style, delay }) {
-  return (
-    <motion.div
-      className="float-card"
-      style={style}
-      initial={{ opacity: 0, y: 24, scale: 0.94 }}
-      animate={{ opacity: 1, y: [0, -8, 0], scale: 1 }}
-      transition={{
-        opacity: { duration: 0.8, delay },
-        scale: { duration: 0.8, delay },
-        y: { duration: 6, delay, repeat: Infinity, ease: 'easeInOut' },
-      }}
-    >
-      <span className="ic"><Icon size={17} /></span>
-      <span><b>{title}</b><small>{sub}</small></span>
-    </motion.div>
   );
 }
 
@@ -122,9 +104,7 @@ export default function Hero() {
               <Suspense fallback={Loading}><Scene3D /></Suspense>
             </SceneBoundary>
           )}
-          <FloatCard icon={Phone} title="Answering call" sub="(555) 234-8901" style={{ top: '3%', left: '-7%' }} delay={1} />
-          <FloatCard icon={FileText} title="Writing SOAP note" sub="Bella · Post-op checkup" style={{ top: '-2%', right: '-8%' }} delay={1.25} />
-          <FloatCard icon={CircleDollarSign} title="AI captured $450" sub="Missed charges in Room 2" style={{ bottom: '-4%', left: '-8%' }} delay={1.5} />
+          <HeroTasks />
         </motion.div>
       </div>
       <div className="scroll-hint"><span>Scroll</span><i /></div>

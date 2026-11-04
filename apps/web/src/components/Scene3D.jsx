@@ -70,6 +70,8 @@ export default function Scene3D() {
       style={{
         position: 'absolute',
         inset: '-6% -12%',
+        zIndex: 1,
+        pointerEvents: 'none',
         maskImage: 'linear-gradient(to bottom, #000 80%, transparent 100%)',
         WebkitMaskImage: 'linear-gradient(to bottom, #000 80%, transparent 100%)',
       }}

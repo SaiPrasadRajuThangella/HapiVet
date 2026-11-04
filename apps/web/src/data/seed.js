@@ -8,6 +8,12 @@ export const stats = [
   { value: 50, suffix: '%', label: 'less admin work' },
 ];
 
+export const activeTasks = [
+  { icon: 'Phone', title: 'Answering call from (555) 234-8901', detail: 'Scheduling appointment for "Max" - wellness exam' },
+  { icon: 'FileText', title: 'Writing SOAP note', detail: 'Bella - Post-op checkup with Dr. Martinez' },
+  { icon: 'CalendarClock', title: 'Optimizing tomorrow\'s schedule', detail: 'Moved 3 appointments to reduce wait times' },
+];
+
 export const clinicNames = [
   'Cary Animal Hospital', 'Apex Veterinary Care', 'Wake Forest Animal Clinic', 'Raleigh Pet Hospital',
   'Sterling Animal Care', 'Ashburn Vet Center', 'Rockville Animal Hospital', 'Coral Creek Pet Hospital',
