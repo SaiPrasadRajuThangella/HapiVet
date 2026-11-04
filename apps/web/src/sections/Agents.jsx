@@ -28,46 +28,48 @@ function Panel({ agent, index, on, onSelect, bodyRef }) {
         onClick={onSelect}
       />
 
-      <div className="agent-ghosts" aria-hidden="true">
-        <span className="agent-word">{word}</span>
-        <span className="agent-word" />
-        <span className="agent-word">{word}</span>
-      </div>
+      <div className="agent-inner">
+        <div className="agent-ghosts" aria-hidden="true">
+          <span className="agent-word">{word}</span>
+          <span className="agent-word" />
+          <span className="agent-word">{word}</span>
+        </div>
 
-      <img className="agent-photo" src={agent.image} alt={agent.alt} loading="lazy" decoding="async" />
+        <img className="agent-photo" src={agent.image} alt={agent.alt} loading="lazy" decoding="async" />
 
-      <div className="agent-rail" aria-hidden="true">
-        <span className="num">{number}</span>
-        <span className="name">{agent.name}</span>
-      </div>
-
-      <div className="agent-body" id={bodyId} ref={bodyRef} inert={on ? undefined : ''}>
-        <div className="agent-head">
-          <span className="agent-ico"><Icon size={20} /></span>
-          <span className="tag">{agent.tag}</span>
+        <div className="agent-rail" aria-hidden="true">
           <span className="num">{number}</span>
+          <span className="name">{agent.name}</span>
         </div>
-        <h3 className="agent-word solid">{word}</h3>
 
-        <div className="agent-info">
-          <div>
-            <p className="agent-blurb">{agent.blurb}</p>
-            <p className="agent-detail">{agent.detail}</p>
+        <div className="agent-body" id={bodyId} ref={bodyRef} inert={on ? undefined : ''}>
+          <div className="agent-head">
+            <span className="agent-ico"><Icon size={20} /></span>
+            <span className="tag">{agent.tag}</span>
+            <span className="num">{number}</span>
           </div>
-          <ul className="agent-points">
-            {agent.points.map((p) => <li key={p}><Tick size={15} />{p}</li>)}
-          </ul>
-        </div>
+          <h3 className="agent-word solid">{word}</h3>
 
-        <div className="agent-foot">
-          <dl className="agent-stats">
-            {agent.stats.map(([value, label]) => (
-              <div key={label}><dd>{value}</dd><dt>{label}</dt></div>
-            ))}
-          </dl>
-          <Link to="/demo" className={`btn btn-sm ${TINTS[index] > 0.7 ? 'btn-light' : 'btn-dark'}`}>
-            See it in action <ArrowRight size={15} />
-          </Link>
+          <div className="agent-info">
+            <div>
+              <p className="agent-blurb">{agent.blurb}</p>
+              <p className="agent-detail">{agent.detail}</p>
+            </div>
+            <ul className="agent-points">
+              {agent.points.map((p) => <li key={p}><Tick size={15} />{p}</li>)}
+            </ul>
+          </div>
+
+          <div className="agent-foot">
+            <dl className="agent-stats">
+              {agent.stats.map(([value, label]) => (
+                <div key={label}><dd>{value}</dd><dt>{label}</dt></div>
+              ))}
+            </dl>
+            <Link to="/demo" className={`btn btn-sm ${TINTS[index] > 0.7 ? 'btn-light' : 'btn-dark'}`}>
+              See it in action <ArrowRight size={15} />
+            </Link>
+          </div>
         </div>
       </div>
     </article>
@@ -86,7 +88,7 @@ export default function Agents() {
       if (!wrap.current) return;
       const heights = bodies.current.map((b) => b?.offsetHeight || 0);
       wrap.current.style.setProperty('--panels-h', `${Math.max(...heights)}px`);
-      heights.forEach((h, i) => bodies.current[i]?.parentElement.style.setProperty('--open-h', `${h}px`));
+      heights.forEach((h, i) => bodies.current[i]?.closest('.agent-panel').style.setProperty('--open-h', `${h}px`));
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -103,21 +105,21 @@ export default function Agents() {
           title={<>Four AI agents.<br /><span className="grad-text">One unified brain.</span></>}
           text="Our four AI agents share context and work together seamlessly. Choose an agent to see what it does."
         />
-        <Reveal y={48}>
-          <div className="agent-panels" ref={wrap}>
-            {agents.map((agent, i) => (
-              <Panel
-                key={agent.key}
-                agent={agent}
-                index={i}
-                on={active === i}
-                onSelect={() => setActive(i)}
-                bodyRef={(el) => { bodies.current[i] = el; }}
-              />
-            ))}
-          </div>
-        </Reveal>
       </div>
+      <Reveal y={48}>
+        <div className="agent-panels" ref={wrap}>
+          {agents.map((agent, i) => (
+            <Panel
+              key={agent.key}
+              agent={agent}
+              index={i}
+              on={active === i}
+              onSelect={() => setActive(i)}
+              bodyRef={(el) => { bodies.current[i] = el; }}
+            />
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }
