@@ -41,6 +41,7 @@ export default function HeroTasks() {
   // Sizes the orbit so a card at either end stays on screen and clear of the hero paragraph.
   useEffect(() => {
     const measure = () => {
+      if (!root.current) return;
       const stage = root.current.getBoundingClientRect();
       const half = (cards.current[0]?.offsetWidth || 0) / 2;
       const centre = stage.left + stage.width / 2;
