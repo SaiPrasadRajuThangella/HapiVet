@@ -101,7 +101,11 @@ export default function Agents() {
     <section className="section" id="agents">
       <div className="agents-card">
         {/* Deliberately not animated: in this section only the four panels move. */}
-        <div className="agents-band dark" style={{ backgroundColor: `rgba(47, 98, 117, ${TINTS[0]})` }}>
+        {/* Takes the active panel's tint, so the two read as one shape and follow the cursor together. */}
+        <div
+          className={`agents-band ${TINTS[active] > 0.7 ? 'dark' : 'light'}`}
+          style={{ backgroundColor: `rgba(47, 98, 117, ${TINTS[active]})` }}
+        >
           <div className="container agents-head">
             <div>
               <span className="eyebrow">Agentic AI Platform</span>
