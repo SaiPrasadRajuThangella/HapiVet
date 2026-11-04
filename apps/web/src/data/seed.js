@@ -21,26 +21,40 @@ export const clinicNames = [
   'Valley View Animal Care', 'Mountain View Vet',
 ];
 
+// Descriptions and capabilities come from the agent hover cards on hapivet.com; details and stats come
+// from its product pages (core-pims, ai-assistant, billing, schedquick).
 export const agents = [
   {
     key: 'front', name: 'Front Desk', tag: 'Voice & scheduling', icon: 'Phone',
-    blurb: 'Answers your phones and handles scheduling, so the whole system knows about each visit from the first call.',
-    points: ['AI voice reception', 'Appointment scheduling', 'Appointment booking links'],
+    image: unsplash('1565277441243-2be39689f95b', 640), alt: 'A teal telephone on a white surface',
+    blurb: 'Answers calls, schedules appointments and handles client inquiries 24/7.',
+    detail: 'When a client calls, their patient records appear instantly. Cancellations automatically notify waitlisted clients, filling schedule gaps without phone tag.',
+    points: ['Call answering', 'Appointment booking', 'Client messaging', 'Follow-up reminders'],
+    stats: [['24/7', 'Client inquiries'], ['40%', 'Fewer no-shows'], ['1 click', 'Recurring appointments']],
   },
   {
     key: 'clinical', name: 'Clinical', tag: 'Notes & care', icon: 'Stethoscope',
-    blurb: 'Writes SOAP notes from dictation and suggests products, services and diagnostics.',
-    points: ['Voice-to-SOAP notes', 'Real-time suggestions', 'One-tap accept / decline'],
+    image: unsplash('1700665537604-412e89a285c3', 640), alt: 'Two veterinary clinicians in blue scrubs examining a dog',
+    blurb: 'Writes SOAP notes, generates treatment plans and captures medical history.',
+    detail: 'Speak during or after the exam and your words become a structured SOAP note. Lab results land directly in patient records, with abnormal values flagged.',
+    points: ['SOAP documentation', 'Treatment plans', 'Medical summaries', 'Lab integration'],
+    stats: [['40%', 'Faster documentation'], ['2 hrs', 'Saved per vet daily'], ['90%', 'Less after-hours charting']],
   },
   {
     key: 'revenue', name: 'Revenue', tag: 'Billing & payments', icon: 'CircleDollarSign',
-    blurb: 'Captures every billable item, builds estimates and recovers declined treatment plans.',
-    points: ['Smart charge capture', 'Split payments & plans', 'Declined-estimate follow-up'],
+    image: unsplash('1786511031583-0b7540b4ab75', 640), alt: 'A person tapping a blue credit card on a payment terminal',
+    blurb: 'Captures missed charges, optimizes pricing and automates billing.',
+    detail: 'Complete your SOAP notes as usual and billable items are captured automatically. Review the generated estimate, send it, and funds reconcile on their own.',
+    points: ['Charge capture', 'Invoice generation', 'Payment reminders', 'Revenue analytics'],
+    stats: [['15%', 'Average revenue increase'], ['$0', 'Missed charges'], ['2x', 'Faster invoicing']],
   },
   {
     key: 'ops', name: 'Operations', tag: 'Staff & inventory', icon: 'Boxes',
-    blurb: 'Optimises shifts, tracks stock and labs, and keeps every location in sync.',
-    points: ['AI staff scheduling', 'Auto-reorder alerts', 'Multi-location dashboard'],
+    image: unsplash('1611072965169-e1534f6f300c', 640), alt: 'White medicine bottles lined up on a wooden shelf',
+    blurb: 'Manages inventory, optimizes schedules and tracks KPIs.',
+    detail: 'One click schedules the entire month, balancing coverage, preferences and labor costs. Low-stock alerts reach you before you run out.',
+    points: ['Inventory alerts', 'Schedule optimization', 'Staff management', 'Performance tracking'],
+    stats: [['10x', 'Faster scheduling'], ['94%', 'Preferences honored'], ['$0', 'Overtime surprises']],
   },
 ];
 
