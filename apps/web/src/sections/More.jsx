@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
 import { ArrowRight, Check, Clock, MessagesSquare, Minus, Stethoscope, X } from 'lucide-react';
-import { Counter, icons, item, Marquee, Reveal, SectionHead, Stagger, Tick } from '../components/ui';
+import { Counter, item, Marquee, Reveal, SectionHead, Stagger, Tick } from '../components/ui';
 import { unsplash } from '../lib/img';
 import { useCollection } from '../lib/store';
-import { clinicNames, compareRows, integrations, onboarding, partners, platform, whyPoints } from '../data/seed';
+import { clinicNames, compareRows, integrations, onboarding, partners, whyPoints } from '../data/seed';
 
 export function Trust() {
   const half = Math.ceil(clinicNames.length / 2);
@@ -18,32 +18,6 @@ export function Trust() {
       <div style={{ display: 'grid', gap: 14 }}>
         <Marquee>{row(clinicNames.slice(0, half))}</Marquee>
         <Marquee reverse>{row(clinicNames.slice(half))}</Marquee>
-      </div>
-    </section>
-  );
-}
-
-export function Platform() {
-  return (
-    <section className="section" style={{ paddingTop: 0 }}>
-      <div className="container">
-        <SectionHead
-          eyebrow="Platform Architecture"
-          title="Built for scale. Designed for trust."
-          text="An AI-native platform with modern architecture that grows with your practice — from single clinic to multi-location enterprise."
-        />
-        <Stagger className="platform-grid">
-          {platform.map(([title, text, icon]) => {
-            const Icon = icons[icon];
-            return (
-              <motion.div className="p-card" key={title} variants={item}>
-                <span className="ico"><Icon size={22} /></span>
-                <h3 className="h3">{title}</h3>
-                <p>{text}</p>
-              </motion.div>
-            );
-          })}
-        </Stagger>
       </div>
     </section>
   );

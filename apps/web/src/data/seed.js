@@ -92,13 +92,44 @@ export const revenueFeatures = [
   ['Capacity Insights', 'Understand client ability to pay for treatment'],
 ];
 
+// Text is from the Platform Architecture section of hapivet.com; points are from its product pages.
 export const platform = [
-  ['Role-Specific Assistants', 'Purpose-built AI assistants that understand the context of each team member’s role.', 'Users'],
-  ['Enterprise Security', 'HIPAA-adjacent best practices with end-to-end encryption, audit logs and role-based access.', 'ShieldCheck'],
-  ['Cloud-Native Infrastructure', '99.9% uptime SLA with automatic failover across regions.', 'Cloud'],
-  ['Open API & Integrations', 'Connect existing tools through a comprehensive API and pre-built integrations.', 'Plug'],
-  ['Real-time Processing', 'Lightning-fast AI responses with edge computing for time-sensitive decisions.', 'Zap'],
-  ['Instant Report Generation', 'Reports that took 5 minutes now generate instantly. Zero wait.', 'FileBarChart'],
+  {
+    name: 'Role-Specific Assistants', tag: 'AI assistants', icon: 'Users', badge: ['4', 'AI agents, one brain'],
+    image: unsplash('1612349317150-e413f6a5b16d', 1100), alt: 'A clinician in a white coat with a stethoscope',
+    text: 'Purpose-built AI assistants that understand the context of each team member’s role and responsibilities.',
+    points: ['Front Desk: calls and scheduling', 'Clinical: SOAP notes and treatment plans', 'Revenue: charge capture and billing', 'Operations: inventory and staff'],
+  },
+  {
+    name: 'Enterprise Security', tag: 'Security', icon: 'ShieldCheck', badge: ['E2E', 'Encrypted end to end'],
+    image: unsplash('1667372283496-893f0b1e7c16', 1100), alt: 'A blue glass cloud with data layers above a silver padlock',
+    text: 'HIPAA-adjacent best practices with end-to-end encryption, audit logs, and role-based access control.',
+    points: ['End-to-end encryption', 'Audit logs', 'Role-based access control', 'DEA-compliant controlled substance tracking'],
+  },
+  {
+    name: 'Cloud-Native Infrastructure', tag: 'Infrastructure', icon: 'Cloud', badge: ['99.9%', 'Uptime SLA'],
+    image: unsplash('1558494949-ef010cbdcc31', 1100), alt: 'Racks of servers in a data center',
+    text: 'Scalable, reliable infrastructure with 99.9% uptime SLA and automatic failover across regions.',
+    points: ['99.9% uptime SLA', 'Automatic failover across regions', 'From single clinic to multi-location enterprise', 'Every screen built for speed'],
+  },
+  {
+    name: 'Open API & Integrations', tag: 'Integrations', icon: 'Plug', badge: ['+50', 'More integrations'],
+    image: unsplash('1544197150-b99a580bb7a8', 1100), alt: 'Blue network cables connected to a patch panel',
+    text: 'Connect with your existing tools through our comprehensive API and pre-built integrations.',
+    points: ['IDEXX Labs and Antech Diagnostics', 'Worldpay payments', 'Roo Vet staffing', 'Data migration from your current PMS'],
+  },
+  {
+    name: 'Real-time Processing', tag: 'Performance', icon: 'Zap', badge: ['Edge', 'Computing for fast AI'],
+    image: unsplash('1550751827-4bd374c3f58b', 1100), alt: 'A glowing teal circuit board',
+    text: 'Lightning-fast AI responses with edge computing for time-sensitive clinical decisions.',
+    points: ['Real-time suggestions during every visit', 'See AI reasoning in real time', 'Voice or text input', 'Drug interaction alerts'],
+  },
+  {
+    name: 'Instant Report Generation', tag: 'Reporting', icon: 'FileBarChart', badge: ['0', 'Wait time on reports'],
+    image: unsplash('1460925895917-afdab827c52f', 1100), alt: 'A laptop showing charts and analytics',
+    text: 'Reports that used to take 5 minutes now generate instantly. Revenue, inventory, controlled substances — any report, zero wait time.',
+    points: ['Revenue reports', 'Inventory reports', 'Controlled substance reports', 'Monthly and annual DEA reports'],
+  },
 ];
 
 export const whyPoints = [
