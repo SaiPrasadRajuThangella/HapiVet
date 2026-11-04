@@ -99,25 +99,29 @@ export default function Agents() {
 
   return (
     <section className="section" id="agents">
-      <div className="container">
+      <div className="agents-card">
         {/* Deliberately not animated: in this section only the four panels move. */}
-        <div className="section-head agents-head">
-          <span className="eyebrow">Agentic AI Platform</span>
-          <h2 className="h2">Four AI agents.<br /><span className="grad-text">One unified brain.</span></h2>
-          <p className="lead">Our four AI agents share context and work together seamlessly. Choose an agent to see what it does.</p>
+        <div className="agents-band dark" style={{ backgroundColor: `rgba(47, 98, 117, ${TINTS[0]})` }}>
+          <div className="container agents-head">
+            <div>
+              <span className="eyebrow">Agentic AI Platform</span>
+              <h2 className="h2">Four AI agents.<br /><span className="agents-accent">One unified brain.</span></h2>
+            </div>
+            <p className="lead">Our four AI agents share context and work together seamlessly. Choose an agent to see what it does.</p>
+          </div>
         </div>
-      </div>
-      <div className="agent-panels" ref={wrap}>
-        {agents.map((agent, i) => (
-          <Panel
-            key={agent.key}
-            agent={agent}
-            index={i}
-            on={active === i}
-            onSelect={() => setActive(i)}
-            bodyRef={(el) => { bodies.current[i] = el; }}
-          />
-        ))}
+        <div className="agent-panels" ref={wrap}>
+          {agents.map((agent, i) => (
+            <Panel
+              key={agent.key}
+              agent={agent}
+              index={i}
+              on={active === i}
+              onSelect={() => setActive(i)}
+              bodyRef={(el) => { bodies.current[i] = el; }}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
